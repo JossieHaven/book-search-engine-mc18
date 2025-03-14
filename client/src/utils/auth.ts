@@ -1,4 +1,3 @@
-// use this to decode a token and get the user's information out of it
 import { jwtDecode } from 'jwt-decode';
 
 interface UserToken {
@@ -6,49 +5,50 @@ interface UserToken {
   exp: number;
 }
 
-// create a new class to instantiate for a user
+// AuthService handles authentication-related functionality
 class AuthService {
-  // get user data
+  // Retrieve user profile data from the token
   getProfile() {
-    return jwtDecode(this.getToken() || '');
-  }
-
-  // check if user's logged in
-  loggedIn() {
-    // Checks if there is a saved token and it's still valid
     const token = this.getToken();
-    return !!token && !this.isTokenExpired(token); // handwaiving here
-  }
-
-  // check if token is expired
-  isTokenExpired(token: string) {
     try {
-      const decoded = jwtDecode<UserToken>(token);
-      if (decoded.exp < Date.now() / 1000) {
-        return true;
-      } 
-      
-      return false;
+      return token ? jwtDecode<UserToken>(token) : null;
     } catch (err) {
-      return false;
+      console.error('Invalid token', err);
+      return null;
     }
   }
 
+  // Check if the user is logged in by verifying the token
+  loggedIn() {
+    const token = this.getToken();
+    return !!token && !this.isTokenExpired(token);
+  }
+
+  // Determine if the token is expired
+  isTokenExpired(token: string) {
+    try {
+      const decoded = jwtDecode<UserToken>(token);
+      return decoded.exp < Date.now() / 1000;
+    } catch (err) {
+      console.error('Invalid token', err);
+      return true;
+    }
+  }
+
+  // Retrieve the stored token from localStorage
   getToken() {
-    // Retrieves the user token from localStorage
     return localStorage.getItem('id_token');
   }
 
+  // Save the token to localStorage and redirect the user
   login(idToken: string) {
-    // Saves user token to localStorage
     localStorage.setItem('id_token', idToken);
     window.location.assign('/');
   }
 
+  // Remove the token and reload the application
   logout() {
-    // Clear user token and profile data from localStorage
     localStorage.removeItem('id_token');
-    // this will reload the page and reset the state of the application
     window.location.assign('/');
   }
 }
