@@ -28,7 +28,7 @@ For this challenge, you'll take a fully functioning Google Books API search engi
 
 1) Open a terminal at the root folder.
 2) npm run build.
-3) npm run start:dev (this will open the search browser)
+3) npm run start:dev (this should open the search browser)
 
 ## Acceptence Criteria
 
